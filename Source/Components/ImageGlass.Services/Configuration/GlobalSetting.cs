@@ -336,7 +336,11 @@ namespace ImageGlass.Services.Configuration
         /// </summary>
         public static ZoomMode ZoomMode { get; set; } = ZoomMode.AutoZoom;
 
-        
+        /// <summary>
+        /// Gets, sets channel index value
+        /// </summary>
+        public static int ChannelIndex { get; set; } = 0;
+
         /// <summary>
         /// Gets, sets zoom optimization value
         /// </summary>
@@ -432,6 +436,12 @@ namespace ImageGlass.Services.Configuration
             $"{(int)Configuration.ToolbarButtons.btnScaletoHeight}," +
             $"{(int)Configuration.ToolbarButtons.btnScaleToFit}," +
             $"{(int)Configuration.ToolbarButtons.btnZoomLock}," +
+            $"{(int)Configuration.ToolbarButtons.Separator}," +
+
+            $"{(int)Configuration.ToolbarButtons.btnChannelR}," +
+            $"{(int)Configuration.ToolbarButtons.btnChannelG}," +
+            $"{(int)Configuration.ToolbarButtons.btnChannelG}," +
+            $"{(int)Configuration.ToolbarButtons.btnChannelA}," +
             $"{(int)Configuration.ToolbarButtons.Separator}," +
 
             $"{(int)Configuration.ToolbarButtons.btnOpen}," +

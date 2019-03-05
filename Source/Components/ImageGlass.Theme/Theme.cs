@@ -430,6 +430,10 @@ namespace ImageGlass.Theme
             ToolbarIcons.Settings = LoadThemeImage(dir, n, "settings", iconHeight);
             ToolbarIcons.About = LoadThemeImage(dir, n, "about", iconHeight);
             ToolbarIcons.Menu = LoadThemeImage(dir, n, "menu", iconHeight);
+            ToolbarIcons.ChannelA = LoadThemeImage(dir, n, "channela", iconHeight);
+            ToolbarIcons.ChannelR = LoadThemeImage(dir, n, "channelr", iconHeight);
+            ToolbarIcons.ChannelG = LoadThemeImage(dir, n, "channelg", iconHeight);
+            ToolbarIcons.ChannelB = LoadThemeImage(dir, n, "channelb", iconHeight);
 
             // TODO Not used?
             //ToolbarIcons.Sharing = LoadThemeImage(dir, n, "uploadfb", iconHeight);
@@ -523,6 +527,10 @@ namespace ImageGlass.Theme
             n.SetAttribute("settings", Path.GetFileName(ToolbarIcons.Settings.Filename));
             n.SetAttribute("about", Path.GetFileName(ToolbarIcons.About.Filename));
             n.SetAttribute("menu", Path.GetFileName(ToolbarIcons.Menu.Filename));
+            n.SetAttribute("channela", Path.GetFileName(ToolbarIcons.ChannelA.Filename));
+            n.SetAttribute("channelr", Path.GetFileName(ToolbarIcons.ChannelR.Filename));
+            n.SetAttribute("channelg", Path.GetFileName(ToolbarIcons.ChannelG.Filename));
+            n.SetAttribute("channelb", Path.GetFileName(ToolbarIcons.ChannelB.Filename));
             nType.AppendChild(n);
 
             root.AppendChild(nType);

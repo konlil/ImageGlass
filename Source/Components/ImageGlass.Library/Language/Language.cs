@@ -262,6 +262,10 @@ namespace ImageGlass.Library
             Items.Add("frmMain.btnScaleToFit", "Scale to fit (Ctrl + /)"); //5.5
             Items.Add("frmMain.btnActualSize", "Actual size (Ctrl + 0)");
             Items.Add("frmMain.btnZoomLock", "Lock zoom ratio (Ctrl + L)");
+            Items.Add("frmMain.btnChannelR", "Show Channel R (Ctrl + 1)");
+            Items.Add("frmMain.btnChannelG", "Show Channel G (Ctrl + 2)");
+            Items.Add("frmMain.btnChannelB", "Show Channel B (Ctrl + 3)");
+            Items.Add("frmMain.btnChannelA", "Show Channel A (Ctrl + 4)");
             Items.Add("frmMain.btnScaletoWidth", "Scale to Width (Ctrl + W)");
             Items.Add("frmMain.btnScaletoHeight", "Scale to Height (Ctrl + H)");
             Items.Add("frmMain.btnWindowAutosize", "Adjust window to actual image dimensions (Ctrl + M)"); //updated 4.0

@@ -68,8 +68,20 @@ namespace ImageGlass
              */
             picMain.ShortcutsEnabled = false;
 
+            picMain.ImageChanged += OnPicMainImageChanged;
+
         }
-        
+
+        protected void OnPicMainImageChanged(object sender, EventArgs e)
+        {
+            //UpdateChannelBtns(0);
+            //避免触发创建channel image导致切换图片速度慢
+            GlobalSetting.ChannelIndex = 0;
+            btnChannelA.Checked = false;
+            btnChannelR.Checked = false;
+            btnChannelG.Checked = false;
+            btnChannelB.Checked = false;
+        }
 
 
         #region Local variables
@@ -1872,6 +1884,11 @@ namespace ImageGlass
             btnScaletoHeight.Image = t.ToolbarIcons.ScaleToHeight.Image;
             btnWindowAutosize.Image = t.ToolbarIcons.AdjustWindowSize.Image;
 
+            btnChannelR.Image = t.ToolbarIcons.ChannelR.Image;
+            btnChannelG.Image = t.ToolbarIcons.ChannelG.Image;
+            btnChannelB.Image = t.ToolbarIcons.ChannelB.Image;
+            btnChannelA.Image = t.ToolbarIcons.ChannelA.Image;
+
             btnOpen.Image = t.ToolbarIcons.OpenFile.Image;
             btnRefresh.Image = t.ToolbarIcons.Refresh.Image;
             btnGoto.Image = t.ToolbarIcons.GoToImage.Image;
@@ -3622,6 +3639,26 @@ namespace ImageGlass
         {
             mnuMain.Show(toolMain, toolMain.Width - mnuMain.Width, toolMain.Height);
         }
+
+        private void btnChannelR_Click(object sender, EventArgs e)
+        {
+            mnuMainChannelR_Click(null, e);
+        }
+
+        private void btnChannelG_Click(object sender, EventArgs e)
+        {
+            mnuMainChannelG_Click(null, e);
+        }
+
+        private void btnChannelB_Click(object sender, EventArgs e)
+        {
+            mnuMainChannelB_Click(null, e);
+        }
+
+        private void btnChannelA_Click(object sender, EventArgs e)
+        {
+            mnuMainChannelA_Click(null, e);
+        }
         #endregion
 
 
@@ -4286,7 +4323,101 @@ namespace ImageGlass
             picMain.ActualSize();
             picMain.CenterToImage();
         }
-        
+
+        private void UpdateChannelBtns(Int32 NewIdx)
+        {
+            if (GlobalSetting.ChannelIndex == NewIdx)
+            {
+                GlobalSetting.ChannelIndex = 0;
+                btnChannelA.Checked = false;
+                btnChannelR.Checked = false;
+                btnChannelG.Checked = false;
+                btnChannelB.Checked = false;
+            }
+            else
+            {
+                GlobalSetting.ChannelIndex = NewIdx;
+                switch (GlobalSetting.ChannelIndex)
+                {
+                case 1:
+                    btnChannelR.Checked = true;
+                    btnChannelA.Checked = false;
+                    btnChannelG.Checked = false;
+                    btnChannelB.Checked = false;
+                    break;
+                case 2:
+                    btnChannelG.Checked = true;
+                    btnChannelA.Checked = false;
+                    btnChannelR.Checked = false;
+                    btnChannelB.Checked = false;
+                    break;
+                case 3:
+                    btnChannelB.Checked = true;
+                    btnChannelA.Checked = false;
+                    btnChannelR.Checked = false;
+                    btnChannelG.Checked = false;
+                    break;
+                case 4:
+                    btnChannelA.Checked = true;
+                    btnChannelR.Checked = false;
+                    btnChannelG.Checked = false;
+                    btnChannelB.Checked = false;
+                    break;
+                default:
+                    btnChannelA.Checked = false;
+                    btnChannelR.Checked = false;
+                    btnChannelG.Checked = false;
+                    btnChannelB.Checked = false;
+                    break;
+                }
+            }
+            
+            if(picMain.Image != null)
+            {
+                picMain.ShowChannel(GlobalSetting.ChannelIndex);
+            }
+        }
+
+        private void mnuMainChannelA_Click(object sender, EventArgs e)
+        {
+            if (picMain.Image == null)
+            {
+                return;
+            }
+
+            UpdateChannelBtns(4);
+        }
+
+        private void mnuMainChannelR_Click(object sender, EventArgs e)
+        {
+            if (picMain.Image == null)
+            {
+                return;
+            }
+
+            UpdateChannelBtns(1);
+        }
+
+        private void mnuMainChannelG_Click(object sender, EventArgs e)
+        {
+            if (picMain.Image == null)
+            {
+                return;
+            }
+
+            UpdateChannelBtns(2);
+        }
+
+        private void mnuMainChannelB_Click(object sender, EventArgs e)
+        {
+            if (picMain.Image == null)
+            {
+                return;
+            }
+
+            UpdateChannelBtns(3);
+        }
+
         private void mnuMainWindowAdaptImage_Click(object sender, EventArgs e)
         {
             if (picMain.Image == null)

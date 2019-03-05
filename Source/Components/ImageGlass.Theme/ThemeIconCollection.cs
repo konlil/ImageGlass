@@ -51,6 +51,10 @@ namespace ImageGlass.Theme
         public ThemeImage ZoomOut { get; set; }
         public ThemeImage ScaleToFit { get; set; }
         public ThemeImage AutoZoom { get; set; }
+        public ThemeImage ChannelR { get; set; }
+        public ThemeImage ChannelG { get; set; }
+        public ThemeImage ChannelB { get; set; }
+        public ThemeImage ChannelA { get; set; }
 
         /// <summary>
         /// Icon collection for the theme
@@ -87,6 +91,10 @@ namespace ImageGlass.Theme
             ZoomOut = new ThemeImage();
             ScaleToFit = new ThemeImage();
             AutoZoom = new ThemeImage();
+            ChannelR = new ThemeImage();
+            ChannelG = new ThemeImage();
+            ChannelB = new ThemeImage();
+            ChannelA = new ThemeImage();
         }
     }
 

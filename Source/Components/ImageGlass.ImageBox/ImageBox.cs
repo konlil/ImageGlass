@@ -124,6 +124,32 @@ namespace ImageGlass
             }
         }
 
+        protected virtual void UpdateChannels()
+        {
+            if(_channelNeedUpdate && _image != null)
+            {
+                Bitmap Source = new Bitmap(_image);
+                _channelA = new Bitmap(Source.Width, Source.Height);
+                _channelR = new Bitmap(Source.Width, Source.Height);
+                _channelG = new Bitmap(Source.Width, Source.Height);
+                _channelB = new Bitmap(Source.Width, Source.Height);
+                for(int j=0; j<Source.Height; j++)
+                {
+                    for(int i=0; i<Source.Width; i++)
+                    {
+                        Color c = Source.GetPixel(i, j);
+                        _channelR.SetPixel(i, j, Color.FromArgb(255, c.R, c.R, c.R));
+                        _channelG.SetPixel(i, j, Color.FromArgb(255, c.G, c.G, c.G));
+                        _channelB.SetPixel(i, j, Color.FromArgb(255, c.B, c.B, c.B));
+                        _channelA.SetPixel(i, j, Color.FromArgb(255, c.A, c.A, c.A));
+                    }
+                }
+                Source = null;
+
+                _channelNeedUpdate = false;
+            }
+        }
+
         #endregion
 
         #region Constants
@@ -166,6 +192,13 @@ namespace ImageGlass
         private Bitmap _gridTile;
 
         private Image _image;
+
+        private bool _channelNeedUpdate;
+        private int _currentChannelIdx;
+        private Bitmap _channelR;
+        private Bitmap _channelG;
+        private Bitmap _channelB;
+        private Bitmap _channelA;
 
         private Color _imageBorderColor;
 
@@ -288,6 +321,8 @@ namespace ImageGlass
             TextBackColor = Color.Transparent;
             TextDisplayMode = ImageBoxGridDisplayMode.Client;
             // ReSharper restore DoNotCallOverridableMethodsInConstructor
+
+            _channelNeedUpdate = false;
         }
 
         #endregion
@@ -1363,6 +1398,64 @@ namespace ImageGlass
         }
 
         /// <summary>
+        ///   Gets the channel image.
+        /// </summary>
+        /// <value>The image.</value>
+        [Category("Appearance")]
+        [DefaultValue(null)]
+        public virtual Image CurrentChannel
+        {
+            get {
+                switch(_currentChannelIdx)
+                {
+                    case 1:
+                        return _channelR;
+                    case 2:
+                        return _channelG;
+                    case 3:
+                        return _channelB;
+                    case 4:
+                        return _channelA;
+                    default:
+                        return _image;
+                }
+            }
+        }
+
+        /// <summary>
+        ///   Gets the channel image.
+        /// </summary>
+        /// <value>The image.</value>
+        [Category("Appearance")]
+        [DefaultValue(null)]
+        public virtual Image ChannelR
+        {
+            get { return _channelR; }
+        }
+
+        /// <summary>
+        ///   Gets the channel image.
+        /// </summary>
+        /// <value>The image.</value>
+        [Category("Appearance")]
+        [DefaultValue(null)]
+        public virtual Image ChannelG
+        {
+            get { return _channelG; }
+        }
+
+        /// <summary>
+        ///   Gets the channel image.
+        /// </summary>
+        /// <value>The image.</value>
+        [Category("Appearance")]
+        [DefaultValue(null)]
+        public virtual Image ChannelB
+        {
+            get { return _channelB; }
+        }
+
+        /// <summary>
         ///   Gets or sets the color of the image border.
         /// </summary>
         /// <value>The color of the image border.</value>
@@ -2082,6 +2175,16 @@ namespace ImageGlass
         {
             AutoScrollPosition = RelativeCenterPoint;
         }
+
+        /// <summary>
+        /// Show channel of the image
+        /// </summary>
+        public virtual void ShowChannel(Int32 Idx)
+        {
+            _currentChannelIdx = Idx;
+            UpdateChannels();
+            Invalidate();
+        }        
 
         /// <summary>
         ///   Enables the redrawing of the image box
@@ -3297,13 +3400,20 @@ namespace ImageGlass
 
             try
             {
-                // Animation. Thanks to teamalpha5441 for the contribution
-                if (IsAnimating && !DesignMode)
+                if(_currentChannelIdx > 0)
                 {
-                    Animator.UpdateFrames(Image);
+                    g.DrawImage(CurrentChannel, GetImageViewPort(), GetSourceImageRegion(), GraphicsUnit.Pixel);
                 }
+                else
+                {
+                    // Animation. Thanks to teamalpha5441 for the contribution
+                    if (IsAnimating && !DesignMode)
+                    {
+                        Animator.UpdateFrames(Image);
+                    }
 
-                g.DrawImage(Image, GetImageViewPort(), GetSourceImageRegion(), GraphicsUnit.Pixel);
+                    g.DrawImage(Image, GetImageViewPort(), GetSourceImageRegion(), GraphicsUnit.Pixel);
+                }
             }
             catch (ArgumentException)
             {
@@ -3990,6 +4100,8 @@ namespace ImageGlass
 
             DefineViewSize();
             IsAnimating = false;
+            _channelNeedUpdate = true;
+            _currentChannelIdx = 0;
 
             if (Image != null)
             {

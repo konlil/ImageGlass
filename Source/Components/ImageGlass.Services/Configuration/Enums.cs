@@ -144,6 +144,10 @@ namespace ImageGlass.Services.Configuration
         // NOTE: add new items here, must match order in _lstToolbarImg.Images list
         btnFlipHorz = 23,
         btnFlipVert = 24,
+        btnChannelR = 25,
+        btnChannelG = 26,
+        btnChannelB = 27,
+        btnChannelA = 28,
 
         MAX // DO NOT ADD ANYTHING AFTER THIS
     }
