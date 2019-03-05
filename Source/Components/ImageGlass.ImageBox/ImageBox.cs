@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Drawing.Imaging;
 
 namespace ImageGlass
 {
@@ -124,32 +125,6 @@ namespace ImageGlass
             }
         }
 
-        protected virtual void UpdateChannels()
-        {
-            if(_channelNeedUpdate && _image != null)
-            {
-                Bitmap Source = new Bitmap(_image);
-                _channelA = new Bitmap(Source.Width, Source.Height);
-                _channelR = new Bitmap(Source.Width, Source.Height);
-                _channelG = new Bitmap(Source.Width, Source.Height);
-                _channelB = new Bitmap(Source.Width, Source.Height);
-                for(int j=0; j<Source.Height; j++)
-                {
-                    for(int i=0; i<Source.Width; i++)
-                    {
-                        Color c = Source.GetPixel(i, j);
-                        _channelR.SetPixel(i, j, Color.FromArgb(255, c.R, c.R, c.R));
-                        _channelG.SetPixel(i, j, Color.FromArgb(255, c.G, c.G, c.G));
-                        _channelB.SetPixel(i, j, Color.FromArgb(255, c.B, c.B, c.B));
-                        _channelA.SetPixel(i, j, Color.FromArgb(255, c.A, c.A, c.A));
-                    }
-                }
-                Source = null;
-
-                _channelNeedUpdate = false;
-            }
-        }
-
         #endregion
 
         #region Constants
@@ -193,12 +168,8 @@ namespace ImageGlass
 
         private Image _image;
 
-        private bool _channelNeedUpdate;
         private int _currentChannelIdx;
-        private Bitmap _channelR;
-        private Bitmap _channelG;
-        private Bitmap _channelB;
-        private Bitmap _channelA;
+        private ColorMatrix _currentChannelMatrix;
 
         private Color _imageBorderColor;
 
@@ -321,8 +292,6 @@ namespace ImageGlass
             TextBackColor = Color.Transparent;
             TextDisplayMode = ImageBoxGridDisplayMode.Client;
             // ReSharper restore DoNotCallOverridableMethodsInConstructor
-
-            _channelNeedUpdate = false;
         }
 
         #endregion
@@ -1403,56 +1372,47 @@ namespace ImageGlass
         /// <value>The image.</value>
         [Category("Appearance")]
         [DefaultValue(null)]
-        public virtual Image CurrentChannel
-        {
+        public virtual ColorMatrix CurrentChannelMatrix
+        {            
             get {
+                float[][] default_matrix = {
+                    new float[] { 0, 0, 0, 0, 0 },
+                    new float[] { 0, 0, 0, 0, 0 },
+                    new float[] { 0, 0, 0, 0, 0 },
+                    new float[] { 0, 0, 0, 1, 0 },
+                    new float[] { 0, 0, 0, 0, 1 }
+                };
+                _currentChannelMatrix = new ColorMatrix(default_matrix);
                 switch(_currentChannelIdx)
                 {
                     case 1:
-                        return _channelR;
+                        _currentChannelMatrix[0, 0] = 1;
+                        _currentChannelMatrix[0, 1] = 1;
+                        _currentChannelMatrix[0, 2] = 1;
+                        break;
                     case 2:
-                        return _channelG;
+                        _currentChannelMatrix[1, 0] = 1;
+                        _currentChannelMatrix[1, 1] = 1;
+                        _currentChannelMatrix[1, 2] = 1;
+                        break;
                     case 3:
-                        return _channelB;
+                        _currentChannelMatrix[2, 0] = 1;
+                        _currentChannelMatrix[2, 1] = 1;
+                        _currentChannelMatrix[2, 2] = 1;
+                        break;
                     case 4:
-                        return _channelA;
+                        _currentChannelMatrix[3, 0] = 1;
+                        _currentChannelMatrix[3, 1] = 1;
+                        _currentChannelMatrix[3, 2] = 1;
+                        break;
                     default:
-                        return _image;
+                        _currentChannelMatrix[0, 0] = 1;
+                        _currentChannelMatrix[1, 1] = 1;
+                        _currentChannelMatrix[2, 2] = 1;
+                        break;
                 }
+                return _currentChannelMatrix;
             }
-        }
-
-        /// <summary>
-        ///   Gets the channel image.
-        /// </summary>
-        /// <value>The image.</value>
-        [Category("Appearance")]
-        [DefaultValue(null)]
-        public virtual Image ChannelR
-        {
-            get { return _channelR; }
-        }
-
-        /// <summary>
-        ///   Gets the channel image.
-        /// </summary>
-        /// <value>The image.</value>
-        [Category("Appearance")]
-        [DefaultValue(null)]
-        public virtual Image ChannelG
-        {
-            get { return _channelG; }
-        }
-
-        /// <summary>
-        ///   Gets the channel image.
-        /// </summary>
-        /// <value>The image.</value>
-        [Category("Appearance")]
-        [DefaultValue(null)]
-        public virtual Image ChannelB
-        {
-            get { return _channelB; }
         }
 
         /// <summary>
@@ -2182,7 +2142,6 @@ namespace ImageGlass
         public virtual void ShowChannel(Int32 Idx)
         {
             _currentChannelIdx = Idx;
-            UpdateChannels();
             Invalidate();
         }        
 
@@ -3402,7 +3361,15 @@ namespace ImageGlass
             {
                 if(_currentChannelIdx > 0)
                 {
-                    g.DrawImage(CurrentChannel, GetImageViewPort(), GetSourceImageRegion(), GraphicsUnit.Pixel);
+                    //create some image attributes
+                    ImageAttributes attributes = new ImageAttributes();
+
+                    //set the color matrix attribute
+                    attributes.SetColorMatrix(CurrentChannelMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+
+                    Rectangle ViewPort = GetImageViewPort();
+                    RectangleF ImageRegion = GetSourceImageRegion();
+                    g.DrawImage(Image, ViewPort, 0, 0, ImageRegion.Width, ImageRegion.Height, GraphicsUnit.Pixel, attributes);
                 }
                 else
                 {
@@ -4100,7 +4067,7 @@ namespace ImageGlass
 
             DefineViewSize();
             IsAnimating = false;
-            _channelNeedUpdate = true;
+
             _currentChannelIdx = 0;
 
             if (Image != null)
